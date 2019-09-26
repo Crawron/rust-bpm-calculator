@@ -1,5 +1,3 @@
-use std::time::Instant;
-
 use winit::{
     event::{ElementState, Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
@@ -7,14 +5,13 @@ use winit::{
 };
 
 mod calculations;
-use calculations::{get_average_duration, get_instant_deltas, to_bpm};
+use calculations::BpmCalculator;
 
 fn main() {
     let event_loop = EventLoop::new();
-
     let _window = Window::new(&event_loop).unwrap();
 
-    let mut beat_times: Vec<Instant> = Vec::new();
+    let mut bpm_calc = BpmCalculator::new();
 
     event_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent {
@@ -27,14 +24,13 @@ fn main() {
             ..
         } => {
             if input.state == ElementState::Pressed {
-                let now = Instant::now();
-                beat_times.push(now);
+                bpm_calc.capture_beat();
 
-                let d = get_instant_deltas(&beat_times);
-                if let Some(durations) = d {
-                    println!("BPM {:?}", to_bpm(get_average_duration(durations)));
-                } else {
-                    println!("Tap again to get a measurement");
+                let bpm = bpm_calc.average_bpm(None);
+
+                match bpm {
+                    Some(bpm) => println!("BPM {:?}", bpm),
+                    None => println!("Tap again to get a measurement"),
                 }
             }
         }
