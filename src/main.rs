@@ -27,10 +27,15 @@ fn main() {
                 bpm_calc.capture_beat();
 
                 let bpm = bpm_calc.average_bpm(None);
+                let last_ten = bpm_calc.average_bpm(Some(10));
+                let last_one = bpm_calc.average_bpm(Some(1));
 
-                match bpm {
-                    Some(bpm) => println!("BPM {:?}", bpm),
-                    None => println!("Tap again to get a measurement"),
+                match (bpm, last_ten, last_one) {
+                    (Some(bpm), Some(last_ten), Some(last_one)) => println!(
+                        "\nBPM\nTotal:\t\t{:.1}\nLast 10:\t{:.1}\nLast one:\t{:.1}",
+                        bpm, last_ten, last_one
+                    ),
+                    _ => println!("Tap again to get a measurement"),
                 }
             }
         }
