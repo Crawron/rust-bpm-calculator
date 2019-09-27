@@ -1,3 +1,4 @@
+use std::cmp::min;
 use std::time::{Duration, Instant};
 
 pub struct BpmCalculator {
@@ -29,7 +30,11 @@ impl BpmCalculator {
         }
 
         let average = match last {
-            Some(last) => get_average(&self.beat_deltas[last..]),
+            Some(last) => {
+                let safe_last = min(last, self.beat_deltas.len());
+                let start = self.beat_deltas.len() - safe_last;
+                get_average(&self.beat_deltas[start..])
+            }
             None => get_average(&self.beat_deltas),
         };
         Some(60.0 / average)
